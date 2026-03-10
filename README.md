@@ -1,8 +1,8 @@
-# OnChain Alpha Radar
+# OnChain Alpha Toolkit
 
 <p align="center">
-  <b>On-Chain Alpha Discovery & Research Pipeline</b><br>
-  Token Discovery · Holdings Analysis · Smart Money Tracking · Research Report
+  <b>On-Chain Alpha Discovery · Smart Money Tracking · Sentiment Alerts</b><br>
+  Two Claude Code Skills for comprehensive crypto research
 </p>
 
 <p align="center">
@@ -11,135 +11,161 @@
 
 ---
 
-A Claude Code Skill that chains together **4 external tools** to systematically discover, analyze, and report on-chain alpha — from raw blockchain signals to professional research reports with visualizations.
+## Two Skills, One Toolkit
+
+### 🔍 Skill 1: OnChain Alpha Radar
+
+**Token Discovery → Holdings Analysis → Smart Money Tracking → Research Report**
+
+Uses OKX OnchainOS to scan the entire market, cross-dimensionally score tokens, and produce research reports.
 
 ```
-Token Discovery → Holdings Analysis → Smart Money Tracking → Research Report
-     ↓                  ↓                    ↓                    ↓
-  onchainos          onchainos            onchainos          deep-research
-  + Twitter          + Twitter            + Twitter          + excalidraw
+onchainos (OKX) + opentwitter-mcp + deep-research + excalidraw-diagram
 ```
 
-## What It Does
+### 🔔 Skill 2: Smart Money Sentinel *(NEW)*
 
-| Phase | Input | Output |
-|-------|-------|--------|
-| **Token Discovery** | Scan chain for trending, meme, smart money signals | Scored candidate list with cross-dimensional ranking |
-| **Holdings Analysis** | Token address | Top 20 holders, concentration, dev reputation, wallet classification |
-| **Smart Money Tracking** | Token address | SM/Whale/KOL signals, conviction assessment, wallet deep dive |
-| **Research Report** | All above data + Twitter | Full Markdown report + Excalidraw visual diagrams |
+**Signal Discovery → News Validation → KOL Sentiment → Wallet Verification → Entry Verdict**
+
+Starts from Binance smart money signals, then cross-validates with news, KOL discussions, and on-chain wallet data.
+
+```
+Binance Skills Hub + opennews-mcp + opentwitter-mcp + base-mcp
+```
+
+---
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Install This Toolkit
 
 ```bash
-# Required: OKX OnchainOS CLI
-curl -sSL https://raw.githubusercontent.com/okx/onchainos-skills/main/install.sh | sh
-
-# Optional: Twitter MCP (get token at https://6551.io/mcp)
-git clone https://github.com/6551Team/opentwitter-mcp.git
-claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory ./opentwitter-mcp run twitter-mcp
-
-# Optional: Deep Research skill
-git clone https://github.com/wshuyi/deep-research.git
-cp -r deep-research/skills/deep-research ~/.claude/skills/
-
-# Optional: Excalidraw Diagram skill
-git clone https://github.com/coleam00/excalidraw-diagram-skill.git
-cp -r excalidraw-diagram-skill ~/.claude/skills/excalidraw-diagram
+git clone https://github.com/zhuyansen/onchain-alpha-radar.git
+cd onchain-alpha-radar
+cp -r .claude ~/your-project/.claude
+cp -r .claude-plugin ~/your-project/.claude-plugin
 ```
 
-### 2. Set Environment Variables
+### 2. Install Tool Dependencies
+
+**For Alpha Radar (OKX-based):**
 
 ```bash
-# Required: OKX API Keys (get from https://www.okx.com/account/my-api)
-export OKX_API_KEY="your-api-key"
-export OKX_SECRET_KEY="your-secret-key"
-export OKX_PASSPHRASE="your-passphrase"
+# onchainos CLI
+curl -sSL https://raw.githubusercontent.com/okx/onchainos-skills/main/install.sh | sh
 
-# If in China: proxy for OKX API (use lowercase!)
+# Set OKX API keys (tutorial: https://x.com/okxchinese/status/2028806839773839683)
+export OKX_API_KEY="your-key"
+export OKX_SECRET_KEY="your-secret"
+export OKX_PASSPHRASE="your-passphrase"
+```
+
+**For Smart Money Sentinel (Binance-based):**
+
+```bash
+# Binance Skills (already included — no API key needed for public endpoints)
+
+# opennews-mcp (get token at https://6551.io/mcp)
+git clone https://github.com/6551Team/opennews-mcp.git .mcp-servers/opennews-mcp
+claude mcp add opennews -e OPENNEWS_TOKEN=<your-token> -- uv --directory .mcp-servers/opennews-mcp run opennews-mcp
+
+# base-mcp (optional, for Base chain wallet analysis)
+claude mcp add-json base-mcp '{"command":"npx","args":["-y","base-mcp@latest"]}'
+```
+
+**Shared:**
+
+```bash
+# opentwitter-mcp (used by both skills, get token at https://6551.io/mcp)
+git clone https://github.com/6551Team/opentwitter-mcp.git .mcp-servers/opentwitter-mcp
+claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory .mcp-servers/opentwitter-mcp run opentwitter-mcp
+
+# China proxy (lowercase required for Rust binaries!)
 export all_proxy=http://127.0.0.1:7890
 ```
 
-### 3. Install This Skill
-
-```bash
-# Clone to your project
-git clone https://github.com/zhuyansen/onchain-alpha-radar.git
-cp -r onchain-alpha-radar/.claude .claude
-cp -r onchain-alpha-radar/.claude-plugin .claude-plugin
-```
-
-### 4. Run
-
-Tell Claude Code:
+### 3. Run
 
 ```
+# Alpha Radar
 Research the hottest token on Solana right now
 给我做一份 Solana 链上研报
-Quick scan $TOKEN
-Track smart money on Solana
+
+# Smart Money Sentinel
+扫描最新的聪明钱信号
+验证 $TOKEN 的入场时机
+Batch scan smart money signals on Solana
 ```
 
-## Scoring System
+---
 
-Tokens are scored across 4 dimensions (max 100 points):
+## Skill Comparison
 
-| Dimension | Weight | Data Source |
-|-----------|--------|-------------|
-| Volume | 30pts | 24h trading volume rank |
-| Momentum | 25pts | 4h price change rank |
-| Smart Money | 25pts | SM/Whale/KOL wallet count + USD + sold ratio |
-| Liquidity | 10pts | Liquidity/MCap ratio health |
-| Community | 10pts | Holder count |
+| | Alpha Radar | Smart Money Sentinel |
+|--|--|--|
+| **Starting Point** | Full market scan (volume/momentum/SM/meme) | Binance smart money signals |
+| **Data Source** | onchainos (OKX) | Binance Skills Hub |
+| **News** | — | opennews-mcp (bullish/bearish) |
+| **Social** | opentwitter-mcp | opentwitter-mcp |
+| **Wallet** | onchainos holders/signals | Binance query-address-info + base-mcp |
+| **Goal** | Discover alpha targets | Validate signals → entry timing |
+| **Output** | Research report | Alert report + action advice |
 
-**Cross-dimensional tokens** (appearing in 2+ dimensions) are prioritized — they indicate genuine alpha vs single-factor noise.
+## Scoring Systems
 
-## Execution Modes
+### Alpha Radar (100 pts)
 
-| Mode | Trigger | What It Does |
-|------|---------|-------------|
-| **Full Pipeline** | "Research $TOKEN" / "做研报" | All 4 phases → complete report |
-| **Quick Scan** | "Quick scan $TOKEN" / "快速扫描" | Price + holders + SM signal → 1-paragraph summary |
-| **Phase-by-Phase** | "What's trending?" / "Track smart money" | Run individual phases |
-| **Smart Money Briefing** | "Smart money on Solana" | SM/Whale/KOL signal dashboard |
+| Dimension | Weight | Source |
+|-----------|--------|--------|
+| Volume | 30 | 24h volume rank |
+| Momentum | 25 | 4h price change |
+| Smart Money | 25 | SM/Whale/KOL signals |
+| Liquidity | 10 | Liq/MCap ratio |
+| Community | 10 | Holder count |
 
-## Example Output
+### Smart Money Sentinel (100 pts)
 
-See the [reports/](./reports/) directory for real examples:
+| Dimension | Weight | Source |
+|-----------|--------|--------|
+| Signal Strength | 25 | SM count, max gain, exit rate |
+| News Sentiment | 20 | Bullish/bearish news count |
+| KOL Sentiment | 20 | Discussion volume, KOL participation |
+| Wallet Verification | 20 | Buy/sell ratio, SM holders, concentration |
+| Fundamentals | 15 | MCap, volume, holders, social links |
 
-- `michi-alpha-report-v2.md` — Full research report with scoring matrix + Twitter data
-- `michi-scoring-matrix.png` — Visual scoring comparison
-
-![Scoring Matrix](./reports/michi-scoring-matrix.png)
+---
 
 ## Tool Dependencies
 
-| Tool | Required | Purpose |
-|------|----------|---------|
-| [onchainos](https://github.com/okx/onchainos-skills) | **Yes** | On-chain data (34 commands: token, market, swap, gateway, portfolio) |
-| [opentwitter-mcp](https://github.com/6551Team/opentwitter-mcp) | No | Twitter/X intelligence (12 tools) |
-| [deep-research](https://github.com/wshuyi/deep-research) | No | 8-step research methodology |
-| [excalidraw-diagram](https://github.com/coleam00/excalidraw-diagram-skill) | No | Visual diagram generation |
+| Tool | Used By | Purpose |
+|------|---------|---------|
+| [onchainos](https://github.com/okx/onchainos-skills) | Alpha Radar | On-chain data (34 commands) |
+| [Binance Skills Hub](https://github.com/binance/binance-skills-hub) | Sentinel | Smart money signals + token/wallet data |
+| [opennews-mcp](https://github.com/6551Team/opennews-mcp) | Sentinel | Crypto news with AI signals (11 tools) |
+| [opentwitter-mcp](https://github.com/6551Team/opentwitter-mcp) | Both | Twitter/X KOL intelligence (12 tools) |
+| [base-mcp](https://github.com/base/base-mcp) | Sentinel | Base chain wallet analysis (14 tools) |
+| [deep-research](https://github.com/wshuyi/deep-research) | Alpha Radar | Research methodology |
+| [excalidraw-diagram](https://github.com/coleam00/excalidraw-diagram-skill) | Alpha Radar | Visual diagram generation |
 
-Pipeline degrades gracefully — if Twitter/deep-research/excalidraw are not installed, those sections are skipped.
+Both skills degrade gracefully — optional tools are skipped with neutral scoring if unavailable.
 
 ## Project Structure
 
 ```
 .claude/
 └── skills/
-    └── onchain-alpha-radar/
-        ├── SKILL.md                    # Main skill (4-phase pipeline methodology)
-        └── templates/
-            ├── report-template.md      # Full report template
-            ├── quick-scan-template.md  # Quick scan template
-            └── smart-money-briefing.md # SM briefing template
+    ├── onchain-alpha-radar/          # Skill 1: Alpha Radar
+    │   ├── SKILL.md
+    │   └── templates/
+    ├── smart-money-sentinel/         # Skill 2: Smart Money Sentinel
+    │   ├── SKILL.md
+    │   └── templates/
+    ├── trading-signal/               # Binance: SM signals
+    ├── query-token-info/             # Binance: token data
+    └── query-address-info/           # Binance: wallet data
 .claude-plugin/
-├── plugin.json                         # Plugin config + dependency declarations
-└── marketplace.json                    # Marketplace metadata
-reports/                                # Example outputs
+└── plugin.json                       # Unified plugin config
+reports/                              # Example outputs
 ```
 
 ## License
@@ -150,6 +176,9 @@ MIT
 
 Built with [Claude Code](https://claude.com/claude-code) by orchestrating:
 - [OKX OnchainOS](https://github.com/okx/onchainos-skills) — on-chain data
+- [Binance Skills Hub](https://github.com/binance/binance-skills-hub) — smart money signals
+- [OpenNews MCP](https://github.com/6551Team/opennews-mcp) — crypto news
 - [OpenTwitter MCP](https://github.com/6551Team/opentwitter-mcp) — Twitter intelligence
+- [Base MCP](https://github.com/base/base-mcp) — Base chain wallet
 - [Deep Research](https://github.com/wshuyi/deep-research) — research methodology
 - [Excalidraw Diagram](https://github.com/coleam00/excalidraw-diagram-skill) — visual diagrams

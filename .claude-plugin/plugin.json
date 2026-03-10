@@ -1,7 +1,7 @@
 {
-  "name": "onchain-alpha-radar",
-  "version": "1.0.0",
-  "description": "On-chain alpha discovery and research pipeline. Token Discovery → Holdings Analysis → Smart Money Tracking → Research Report.",
+  "name": "onchain-alpha-toolkit",
+  "version": "2.0.0",
+  "description": "On-chain alpha discovery, smart money tracking, and sentiment alert toolkit. Includes two skills: onchain-alpha-radar (OKX-based token discovery pipeline) and smart-money-sentinel (Binance-based signal validation pipeline).",
   "author": "chain-data",
   "skills": ["./skills/"],
   "keywords": [
@@ -19,32 +19,63 @@
     "web3",
     "holdings",
     "portfolio",
-    "research-report"
+    "research-report",
+    "sentinel",
+    "trading-signal",
+    "news",
+    "sentiment",
+    "binance",
+    "kol"
   ],
   "dependencies": {
     "onchainos-skills": {
       "source": "okx/onchainos-skills",
       "type": "cli-binary",
-      "required": true,
-      "install": "curl -sSL https://raw.githubusercontent.com/okx/onchainos-skills/main/install.sh | sh"
+      "required": false,
+      "install": "curl -sSL https://raw.githubusercontent.com/okx/onchainos-skills/main/install.sh | sh",
+      "usedBy": ["onchain-alpha-radar"]
+    },
+    "binance-skills-hub": {
+      "source": "binance/binance-skills-hub",
+      "type": "skill",
+      "required": false,
+      "install": "git clone https://github.com/binance/binance-skills-hub.git && cp -r binance-skills-hub/skills/binance-web3/trading-signal .claude/skills/ && cp -r binance-skills-hub/skills/binance-web3/query-address-info .claude/skills/ && cp -r binance-skills-hub/skills/binance-web3/query-token-info .claude/skills/",
+      "usedBy": ["smart-money-sentinel"]
+    },
+    "opennews-mcp": {
+      "source": "6551Team/opennews-mcp",
+      "type": "mcp-server",
+      "required": false,
+      "install": "git clone https://github.com/6551Team/opennews-mcp.git && claude mcp add opennews -e OPENNEWS_TOKEN=<your-token> -- uv --directory ./opennews-mcp run opennews-mcp",
+      "usedBy": ["smart-money-sentinel"]
     },
     "opentwitter-mcp": {
       "source": "6551Team/opentwitter-mcp",
       "type": "mcp-server",
       "required": false,
-      "install": "claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory /path/to/opentwitter-mcp run opentwitter-mcp"
+      "install": "git clone https://github.com/6551Team/opentwitter-mcp.git && claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory ./opentwitter-mcp run opentwitter-mcp",
+      "usedBy": ["onchain-alpha-radar", "smart-money-sentinel"]
+    },
+    "base-mcp": {
+      "source": "base/base-mcp",
+      "type": "mcp-server",
+      "required": false,
+      "install": "npm install -g base-mcp && claude mcp add-json base-mcp '{\"command\":\"npx\",\"args\":[\"-y\",\"base-mcp@latest\"]}'",
+      "usedBy": ["smart-money-sentinel"]
     },
     "deep-research": {
       "source": "wshuyi/deep-research",
       "type": "skill",
       "required": false,
-      "install": "git clone https://github.com/wshuyi/deep-research.git && cp -r deep-research/skills/deep-research ~/.claude/skills/"
+      "install": "git clone https://github.com/wshuyi/deep-research.git && cp -r deep-research/skills/deep-research ~/.claude/skills/",
+      "usedBy": ["onchain-alpha-radar"]
     },
     "excalidraw-diagram": {
       "source": "coleam00/excalidraw-diagram-skill",
       "type": "skill",
       "required": false,
-      "install": "git clone https://github.com/coleam00/excalidraw-diagram-skill.git && cp -r excalidraw-diagram-skill .claude/skills/excalidraw-diagram"
+      "install": "git clone https://github.com/coleam00/excalidraw-diagram-skill.git && cp -r excalidraw-diagram-skill .claude/skills/excalidraw-diagram",
+      "usedBy": ["onchain-alpha-radar"]
     }
   }
 }
