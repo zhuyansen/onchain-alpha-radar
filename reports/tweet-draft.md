@@ -8,10 +8,10 @@
 Token 发现 → 持仓分析 → Smart Money 追踪 → 研报输出
 
 4 个工具串联，从链上原始信号到专业研报，全程自动化：
-· onchainos (@okaborofficial) → 链上数据
-· opentwitter-mcp (@6551Team) → Twitter 情报
-· deep-research (@wshuyi) → 研究方法论
-· excalidraw-diagram (@coleam00) → 可视化图表
+· onchainos (@okaborofficial) → 链上数据 https://github.com/okx/onchainos-skills
+· opentwitter-mcp (@6551Team) → Twitter 情报 https://github.com/6551team/opentwitter-mcp
+· deep-research (@wshuyi) → 研究方法论 https://github.com/wshuyi/deep-research
+· excalidraw-diagram (@coleam00) → 可视化图表 https://github.com/coleam00/excalidraw-diagram
 
 已开源：https://github.com/zhuyansen/onchain-alpha-radar
 
