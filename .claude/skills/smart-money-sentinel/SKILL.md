@@ -6,7 +6,8 @@ description: |
   optimal entry timing.
 
   Chains together: Binance Skills (trading-signal, query-token-info, query-address-info),
-  opennews-mcp (crypto news), opentwitter-mcp (KOL tracking), and base-mcp (Base chain wallet).
+  opennews-mcp (crypto news), opentwitter-mcp (KOL tracking), base-mcp (Base chain wallet),
+  and excalidraw-diagram (visual diagrams).
 
   Use when the user wants to: track smart money movements, check entry timing, monitor whale alerts,
   cross-validate trading signals with news and social sentiment, or get a comprehensive signal report.
@@ -18,7 +19,7 @@ description: |
 
 # Smart Money Sentinel — 聪明钱哨兵
 
-> 信号发现 → 新闻验证 → KOL 舆情 → 钱包确认 → 综合研判
+> 信号发现 → 新闻验证 → KOL 舆情 → 钱包确认 → 综合研判 → 可视化图表
 
 ## Architecture
 
@@ -35,6 +36,12 @@ description: |
 │       │                                              │         │
 │       └──────────────── Phase 5 ─────────────────────┘         │
 │                      综合研判 + 行动建议                         │
+│                             │                                   │
+│                      ┌──────────┐                               │
+│                      │ Phase 6  │                               │
+│                      │Excalidraw│                               │
+│                      │ 可视化图表 │                               │
+│                      └──────────┘                               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -48,6 +55,7 @@ description: |
 | **opennews-mcp** | MCP Server | 新闻利好/利空验证 | ✅ Yes |
 | **opentwitter-mcp** | MCP Server | KOL 讨论追踪 | ⚠️ Optional |
 | **base-mcp** | MCP Server | Base 链钱包分析 | ⚠️ Optional |
+| **excalidraw-diagram** | Skill | 可视化信号矩阵图表 | ⚠️ Optional |
 
 ## Supported Chains
 
@@ -307,6 +315,42 @@ curl --location 'https://web3.binance.com/bapi/defi/v3/public/wallet-direct/buw/
 使用 `templates/alert-report.md` 模板生成研报，保存到 `reports/` 目录。
 
 文件命名：`{token_symbol}-sentinel-{date}.md`
+
+---
+
+## Phase 6: 可视化图表（Excalidraw Visualization）
+
+**Goal**: 生成 Excalidraw 可视化图表，直观展示信号验证结果
+
+> ⚠️ 如果 excalidraw-diagram skill 不可用，跳过此阶段
+
+### Step 6.1: 信号矩阵图
+
+生成一个 Sentinel Signal Matrix 图表，包含：
+
+1. **标题区**: "Smart Money Sentinel — {TOKEN_SYMBOL}" + 日期 + 链名
+2. **信号概览行**: Token 名称、方向、SM 数量、MaxGain、ExitRate、状态、得分（高亮第 1 名）
+3. **五维评分面板**: 5 个色块分别展示各维度得分
+   - 信号强度 → 蓝色块
+   - 新闻情绪 → 绿色/红色块（根据利好利空）
+   - KOL 舆情 → 紫色块
+   - 持仓验证 → 青色块
+   - 基本面 → 橙色块
+4. **箭头汇聚**: 5 个色块箭头指向底部
+5. **Verdict 面板**: 深色底 + 总分 + 行动建议 + 关键风险
+
+### Step 6.2: 信号对比图（批量扫描模式）
+
+在批量扫描模式下，生成所有信号的横向对比图：
+
+1. 每个信号一行，包含 Token 名、SM 数量、MaxGain、状态
+2. 按得分降序排列
+3. 用颜色区分：绿色(高分) → 黄色(中等) → 灰色(低分)
+
+### Step 6.3: 输出
+
+- 保存为 `reports/{token_symbol}-sentinel-matrix.excalidraw`
+- 如果 render_excalidraw.py 可用，渲染为 PNG：`reports/{token_symbol}-sentinel-matrix.png`
 
 ---
 
