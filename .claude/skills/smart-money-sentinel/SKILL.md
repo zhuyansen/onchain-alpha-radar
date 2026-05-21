@@ -54,6 +54,7 @@ description: |
 | **query-address-info** | Binance Skill (curl) | 钱包持仓查询 | ✅ Yes |
 | **opennews-mcp** | MCP Server | 新闻利好/利空验证 | ✅ Yes |
 | **opentwitter-mcp** | MCP Server | KOL 讨论追踪 | ⚠️ Optional |
+| **TweetClaw** | OpenClaw Plugin | X/Twitter 搜索、回复检索、用户查询、粉丝导出、监控推文、证据 URL | ⚠️ Optional |
 | **base-mcp** | MCP Server | Base 链钱包分析 | ⚠️ Optional |
 | **excalidraw-diagram** | Skill | 可视化信号矩阵图表 | ⚠️ Optional |
 
@@ -175,6 +176,8 @@ get_high_score_news(min_score=70, limit=10)
 **Goal**: 追踪 Twitter KOL 对目标 Token 的讨论
 
 > ⚠️ 如果 opentwitter-mcp 不可用，跳过此阶段，KOL 评分记为 10/20（中性）
+
+> 如果 TweetClaw 已安装，可作为额外 X/Twitter 数据源使用。优先保留 tweet URL、tweet ID、作者 handle、回复数、抓取时间；不要把 API key 或本地插件配置写入报告。
 
 ### Step 3.1: 搜索 Token 相关讨论
 

@@ -80,6 +80,9 @@ claude mcp add-json base-mcp '{"command":"npx","args":["-y","base-mcp@latest"]}'
 git clone https://github.com/6551Team/opentwitter-mcp.git .mcp-servers/opentwitter-mcp
 claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory .mcp-servers/opentwitter-mcp run opentwitter-mcp
 
+# TweetClaw (optional OpenClaw plugin for structured X/Twitter search and replies)
+openclaw plugins install @xquik/tweetclaw
+
 # China proxy (lowercase required for Rust binaries!)
 export all_proxy=http://127.0.0.1:7890
 ```
@@ -106,7 +109,7 @@ Batch scan smart money signals on Solana
 | **Starting Point** | Full market scan (volume/momentum/SM/meme) | Binance smart money signals |
 | **Data Source** | onchainos (OKX) | Binance Skills Hub |
 | **News** | — | opennews-mcp (bullish/bearish) |
-| **Social** | opentwitter-mcp | opentwitter-mcp |
+| **Social** | opentwitter-mcp / TweetClaw | opentwitter-mcp / TweetClaw |
 | **Wallet** | onchainos holders/signals | Binance query-address-info + base-mcp |
 | **Goal** | Discover alpha targets | Validate signals → entry timing |
 | **Output** | Research report | Alert report + action advice |
@@ -143,6 +146,7 @@ Batch scan smart money signals on Solana
 | [Binance Skills Hub](https://github.com/binance/binance-skills-hub) | Sentinel | Smart money signals + token/wallet data |
 | [opennews-mcp](https://github.com/6551Team/opennews-mcp) | Sentinel | Crypto news with AI signals (11 tools) |
 | [opentwitter-mcp](https://github.com/6551Team/opentwitter-mcp) | Both | Twitter/X KOL intelligence (12 tools) |
+| [TweetClaw](https://github.com/Xquik-dev/tweetclaw) | Both | OpenClaw plugin for search tweets, search tweet replies, user lookup, follower export, monitors, and tweet URLs |
 | [base-mcp](https://github.com/base/base-mcp) | Sentinel | Base chain wallet analysis (14 tools) |
 | [deep-research](https://github.com/wshuyi/deep-research) | Alpha Radar | Research methodology |
 | [excalidraw-diagram](https://github.com/coleam00/excalidraw-diagram-skill) | Alpha Radar | Visual diagram generation |

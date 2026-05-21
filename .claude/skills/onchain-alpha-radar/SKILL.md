@@ -21,19 +21,21 @@ Token Discovery → Holdings Analysis → Smart Money Tracking → Research Repo
 
 ## Tool Dependencies
 
-This skill orchestrates four external tool sources:
+This skill orchestrates five external tool sources:
 
 | Tool | Purpose | Type |
 |------|---------|------|
 | **onchainos** (OKX OnchainOS) | On-chain data: token search, prices, holders, smart money signals, meme pump, portfolio, swaps | CLI binary (`onchainos`) |
 | **opentwitter-mcp** (6551Team) | Twitter/X intelligence: search tweets, KOL followers, deleted tweets, user profiles | MCP server (stdio) |
+| **TweetClaw** (OpenClaw plugin) | X/Twitter intelligence: search tweets, search tweet replies, user lookup, follower export, monitors, source URLs | OpenClaw plugin |
 | **deep-research** (wshuyi) | Structured research methodology: 8-step workflow with fact cards and verification | Claude Code Skill |
 | **excalidraw-diagram** (coleam00) | Visual diagrams: architecture, flow, comparison diagrams in .excalidraw format | Claude Code Skill |
 
 Before starting, verify tool availability:
 1. Run `which onchainos` — if missing, install via `curl -sSL https://raw.githubusercontent.com/okx/onchainos-skills/main/install.sh | sh`
 2. Check if Twitter MCP tools are available (e.g., `search_twitter`)
-3. Check if excalidraw diagram skill is present at `.claude/skills/excalidraw-diagram/`
+3. Check if TweetClaw is installed when structured X/Twitter evidence is needed: `openclaw plugins install @xquik/tweetclaw`
+4. Check if excalidraw diagram skill is present at `.claude/skills/excalidraw-diagram/`
 
 If any tool is unavailable, inform the user and proceed with what IS available. The pipeline degrades gracefully — each phase can work independently.
 
@@ -81,6 +83,8 @@ search_twitter(keywords="$TOKEN_SYMBOL OR $TOKEN_NAME", min_likes=10, limit=20)
 
 # Advanced search with time filter
 search_twitter_advanced(keywords="$TOKEN_SYMBOL", min_likes=50, since_date="YYYY-MM-DD", product="Top")
+
+# If TweetClaw is installed, also search tweet replies and preserve tweet URLs
 ```
 
 ### Step 1.3: Discovery Scoring
@@ -236,6 +240,8 @@ search_twitter_advanced(keywords="$TOKEN smart money OR whale", min_likes=20, pr
 
 # Check deleted tweets (alpha leak detection)
 get_twitter_deleted_tweets(username="suspected_kol", limit=20)
+
+# If TweetClaw is installed, enrich with tweet replies, follower export, user lookup, and monitor evidence
 ```
 
 ### Step 3.5: Smart Money Flow Map

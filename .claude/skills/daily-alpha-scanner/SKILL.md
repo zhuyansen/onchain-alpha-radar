@@ -51,6 +51,9 @@ which xreach && xreach search "test" --json -n 1 --proxy http://127.0.0.1:7890 2
 
 # 4. opentwitter-mcp — Twitter MCP server (alternative to xreach)
 #    If configured: opentwitter MCP tools are available
+
+# 5. TweetClaw - OpenClaw plugin for structured X/Twitter search, replies, user lookup, followers, and monitor evidence
+#    Install: openclaw plugins install @xquik/tweetclaw
 ```
 
 **At least one social source must work.** If all fail, Step 3 is skipped and social score defaults to 50 (neutral).
@@ -173,6 +176,7 @@ Source priority (use all that work):
 2. Reddit API    → curl to reddit JSON endpoints (always available)
 3. xreach CLI    → Twitter search (if installed + authenticated)
 4. opentwitter   → Twitter MCP (if MCP configured)
+5. TweetClaw     → OpenClaw plugin (if installed)
 ```
 
 Record which sources are active. If none work, skip this step entirely and assign `socialScore = 50` (neutral) for all tokens.
@@ -228,6 +232,8 @@ xreach search "$TOKEN_SYMBOL crypto" --json -n 15 --proxy http://127.0.0.1:7890
 ```
 
 If opentwitter MCP is available, use its search tool instead.
+
+If TweetClaw is installed, use it as an additional X/Twitter source. Prefer tweet URLs, tweet IDs, author handles, reply counts, and capture dates in the evidence table. Never include API keys or local plugin config values in reports.
 
 From results, extract:
 - **tweetCount**: number of tweets in past 24-48h

@@ -80,6 +80,9 @@ claude mcp add-json base-mcp '{"command":"npx","args":["-y","base-mcp@latest"]}'
 git clone https://github.com/6551Team/opentwitter-mcp.git .mcp-servers/opentwitter-mcp
 claude mcp add twitter -e TWITTER_TOKEN=<你的token> -- uv --directory .mcp-servers/opentwitter-mcp run opentwitter-mcp
 
+# TweetClaw（可选 OpenClaw 插件，用于结构化 X/Twitter 搜索和回复检索）
+openclaw plugins install @xquik/tweetclaw
+
 # 国内代理（Rust 程序需要小写！）
 export all_proxy=http://127.0.0.1:7890
 ```
@@ -106,7 +109,7 @@ export all_proxy=http://127.0.0.1:7890
 | **起点** | 全市场扫描（量/动量/SM/Meme） | 币安聪明钱信号 |
 | **数据源** | onchainos (OKX) | Binance Skills Hub |
 | **新闻** | 无 | opennews-mcp（利好/利空验证） |
-| **社交** | opentwitter-mcp | opentwitter-mcp |
+| **社交** | opentwitter-mcp / TweetClaw | opentwitter-mcp / TweetClaw |
 | **钱包** | onchainos 持仓/信号 | Binance query-address-info + base-mcp |
 | **目标** | 发现 Alpha 标的 | 验证信号 → 判断入场时机 |
 | **输出** | 研究报告 | 预警报告 + 行动建议 |
@@ -143,6 +146,7 @@ export all_proxy=http://127.0.0.1:7890
 | [Binance Skills Hub](https://github.com/binance/binance-skills-hub) | Sentinel | 聪明钱信号 + Token/钱包数据 |
 | [opennews-mcp](https://github.com/6551Team/opennews-mcp) | Sentinel | 加密新闻 + AI 信号（11 个工具） |
 | [opentwitter-mcp](https://github.com/6551Team/opentwitter-mcp) | 两者共用 | Twitter KOL 情报（12 个工具） |
+| [TweetClaw](https://github.com/Xquik-dev/tweetclaw) | 两者共用 | OpenClaw 插件，可搜索推文、搜索回复、查询用户、导出粉丝、监控推文，并保留 Tweet URL 作为 KOL 证据 |
 | [base-mcp](https://github.com/base/base-mcp) | Sentinel | Base 链钱包分析（14 个工具） |
 | [deep-research](https://github.com/wshuyi/deep-research) | Alpha Radar | 研究方法论 |
 | [excalidraw-diagram](https://github.com/coleam00/excalidraw-diagram-skill) | Alpha Radar | 可视化图表 |
