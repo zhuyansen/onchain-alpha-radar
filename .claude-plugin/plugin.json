@@ -56,6 +56,13 @@
       "install": "git clone https://github.com/6551Team/opentwitter-mcp.git && claude mcp add twitter -e TWITTER_TOKEN=<your-token> -- uv --directory ./opentwitter-mcp run opentwitter-mcp",
       "usedBy": ["onchain-alpha-radar", "smart-money-sentinel"]
     },
+    "tweetclaw": {
+      "source": "Xquik-dev/tweetclaw",
+      "type": "openclaw-plugin",
+      "required": false,
+      "install": "openclaw plugins install @xquik/tweetclaw",
+      "usedBy": ["onchain-alpha-radar", "smart-money-sentinel"]
+    },
     "base-mcp": {
       "source": "base/base-mcp",
       "type": "mcp-server",
