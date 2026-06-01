@@ -1,17 +1,17 @@
 ---
 name: daily-alpha-scanner
-description: "One-click daily alpha scanner that runs a full 6-step on-chain research pipeline using OKX OnchainOS + social sentiment analysis: (1) Hot Token Discovery with narrative categorization (AI, Meme, DeFi, Infra), (2) Smart Money / KOL / Whale buy-signal tracking with sold-ratio scoring, (3) Social Sentiment Scan — multi-source social intelligence via crypto news (opennews), Reddit community buzz, and Twitter KOL tracking (xreach/opentwitter), (4) Meme Coin launchpad scanning (pump.fun, fourmeme) with dev reputation and bundle/sniper detection, (5) Batch security audit (honeypot, mintable, fake LP, wash trading), (6) Consolidated briefing with 6-dimension composite scoring (0-100) and BUY / WATCH / AVOID verdicts. Supports Solana, Base, Ethereum, BSC, Arbitrum. Use when the user wants a daily market scan, alpha discovery, token recommendations, or asks 'what to buy today'. Trigger keywords: daily scan, alpha scanner, today's alpha, what to buy, market scan, daily briefing, 每日扫描, 今日推荐, 扫链, 今天买什么, 市场扫描, 链上日报, 每日研报."
+description: "One-click daily alpha scanner that runs a full 7-step on-chain research pipeline using OKX OnchainOS + social sentiment + historical backtesting: (1) Hot Token Discovery with narrative categorization, (2) Smart Money / KOL / Whale buy-signal tracking, (3) Social Sentiment Scan via crypto news (opennews), Reddit, and Twitter KOL tracking (xreach), (4) Meme Coin launchpad scanning with dev reputation and bundle/sniper detection, (5) Batch security audit (honeypot, mintable, fake LP, wash trading), (6) Historical Signal Validation via DexPaprika OHLCV — backtest what happened after past smart money entries, (7) Consolidated briefing with 7-dimension composite scoring (0-100) and BUY / WATCH / AVOID verdicts. Supports Solana, Base, Ethereum, BSC, Arbitrum. Use when the user wants a daily market scan, alpha discovery, token recommendations, or asks 'what to buy today'. Trigger keywords: daily scan, alpha scanner, today's alpha, what to buy, market scan, daily briefing, 每日扫描, 今日推荐, 扫链, 今天买什么, 市场扫描, 链上日报, 每日研报."
 license: MIT
 compatibility: "Requires onchainos CLI v3.1+ and OKX Web3 API key (OKX_API_KEY, OKX_SECRET_KEY, OKX_PASSPHRASE). Internet access required for on-chain data queries."
 metadata:
   author: zhuyansen
-  version: "2.0.0"
+  version: "3.0.0"
   homepage: "https://github.com/zhuyansen/daily-alpha-scanner"
 ---
 
 # Daily Alpha Scanner
 
-A systematic 6-step pipeline that scans on-chain data + social sentiment across multiple chains and produces a consolidated briefing with purchase recommendations.
+A systematic 7-step pipeline that scans on-chain data + social sentiment + historical backtesting across multiple chains and produces a consolidated briefing with purchase recommendations.
 
 ## Pipeline
 
@@ -20,7 +20,9 @@ Step 1: Hot Tokens  →  Step 2: Smart Money  →  Step 3: Social Sentiment
      ↓                      ↓                        ↓
 Step 4: Meme Scan  →  Step 5: Security Audit (batch scan all candidates)
      ↓
-Step 6: Consolidated Briefing + Purchase Recommendations (6D scoring)
+Step 6: Signal Backtesting (DexPaprika OHLCV — historical validation)
+     ↓
+Step 7: Consolidated Briefing + Purchase Recommendations (7D scoring)
 ```
 
 ## Prerequisites
@@ -54,6 +56,22 @@ which xreach && xreach search "test" --json -n 1 --proxy http://127.0.0.1:7890 2
 ```
 
 **At least one social source must work.** If all fail, Step 3 is skipped and social score defaults to 50 (neutral).
+
+### Historical Data: DexPaprika (free, no API key)
+
+```bash
+# DexPaprika provides DEX historical OHLCV data by token contract address
+# Supports Solana, Base, Ethereum, BSC, Arbitrum + 33 networks
+# REST API — no installation needed, just curl
+
+# Test:
+curl -s "https://api.dexpaprika.com/search?query=TROLL" | python3 -c "import json,sys; print(json.loads(sys.stdin.read()).get('tokens',[])[0])"
+
+# Optional: add as MCP server for richer integration
+# claude mcp add dexpaprika -- npx -y dexpaprika-mcp
+```
+
+If DexPaprika API is unreachable, Step 6 is skipped and backtestScore defaults to 50 (neutral).
 
 ## Execution
 
@@ -384,34 +402,133 @@ Key fields:
 
 ---
 
-## Step 6: Consolidated Briefing
+## Step 6: Signal Backtesting (Historical Validation)
+
+**Goal**: For BUY/WATCH candidates that passed security audit, validate the signal by checking historical price performance using DexPaprika OHLCV data.
+
+### 6.1 Select Candidates for Backtesting
+
+Only backtest tokens that:
+- Passed Step 5 security audit (Risk = LOW or MEDIUM, no critical flags)
+- Have a composite score > 45 from Steps 1-5 (skip obvious AVOIDs)
+- Max 5 tokens to backtest (API rate limiting)
+
+### 6.2 Get Token Pool (Highest Liquidity)
+
+For each candidate, find the highest-liquidity DEX pool:
+
+```bash
+curl -s "https://api.dexpaprika.com/networks/<network>/tokens/<tokenAddress>/pools?limit=3"
+```
+
+Network mapping:
+- Solana → `solana`
+- Base → `base`
+- Ethereum → `ethereum`
+- BSC → `bsc`
+- Arbitrum → `arbitrum-one`
+
+From results, pick the pool with highest `volume_usd`. Record `pool_id`.
+
+### 6.3 Pull Historical OHLCV
+
+```bash
+# 30-day daily candles
+curl -s "https://api.dexpaprika.com/networks/<network>/pools/<pool_id>/ohlcv?start=<30d_ago>&end=<today>&interval=24h&limit=30"
+
+# 7-day hourly candles (for recent price action)
+curl -s "https://api.dexpaprika.com/networks/<network>/pools/<pool_id>/ohlcv?start=<7d_ago>&end=<today>&interval=1h&limit=168"
+```
+
+Available intervals: `1m`, `5m`, `10m`, `15m`, `30m`, `1h`, `6h`, `12h`, `24h`
+
+### 6.4 Compute Signal Metrics
+
+From OHLCV data, calculate:
+
+**Price Trend:**
+- `price_7d_change`: 7-day price change %
+- `price_30d_change`: 30-day price change %
+- `price_from_ath`: distance from 30-day all-time high %
+- `price_from_atl`: distance from 30-day all-time low %
+
+**Volatility:**
+- `daily_volatility`: average daily (high-low)/open %
+- `max_drawdown_7d`: worst peak-to-trough decline in 7 days
+
+**Volume Trend:**
+- `volume_trend`: is 7d avg volume higher or lower than 30d avg? (expanding = bullish)
+- `volume_spike_days`: days with volume > 3x average in last 30d
+
+**Support/Resistance:**
+- `current_vs_7d_vwap`: current price relative to 7-day VWAP (above = bullish, below = bearish)
+- `consolidation_range`: is price in a tight range (<10% spread) in last 3 days? (potential breakout)
+
+### 6.5 Smart Money Entry Timing Analysis
+
+If the token appeared in Step 2 (smart money signals), analyze:
+- Where is the current price relative to when smart money likely entered?
+- Did SM enter near recent lows (good timing) or near highs (chasing)?
+- Is the token still within 20% of SM entry zone? (potential upside remains)
+- Has SM already captured > 50% of the recent move? (late entry risk)
+
+Estimate SM entry price by looking at the OHLCV around the signal detection time.
+
+### 6.6 Backtest Scoring
+
+Rate each token's historical performance:
+
+| backtestScore | Criteria |
+|---------------|----------|
+| 80-100 | Uptrend + expanding volume + near support + SM entered low |
+| 60-79 | Mixed trend but positive volume + reasonable entry zone |
+| 40-59 | Sideways/declining + no volume expansion |
+| 20-39 | Downtrend + shrinking volume + SM entry near highs |
+| 0-19 | Crash + extreme drawdown + volume collapse |
+
+### 6.7 Backtest Signal Flags
+
+- 📈 **UPTREND**: 7d change > +15%, expanding volume → momentum confirmed
+- 🔄 **CONSOLIDATION**: tight range + volume drying up → potential breakout/breakdown
+- 📉 **DOWNTREND**: 7d change < -20%, declining volume → avoid or wait for bottom
+- 💎 **DIAMOND_ENTRY**: price within 10% of 30d low + volume expanding → potential reversal point
+- 🏔️ **NEAR_ATH**: price within 10% of 30d high → late entry risk, wait for pullback
+
+---
+
+## Step 7: Consolidated Briefing
 
 **Goal**: Synthesize all data into a single actionable report.
 
-### 6.1 Report Structure
+### 7.1 Report Structure
 
 Use the template at `templates/daily-briefing.md` to generate the output.
 
-### 6.2 Scoring Model (6 Dimensions)
+### 7.2 Scoring Model (7 Dimensions)
 
 Each candidate token gets a composite score (0-100):
 
 | Factor | Weight | Data Source |
 |--------|--------|-------------|
 | Narrative strength | 10% | Step 1 categorization + current market meta |
-| On-chain momentum | 15% | Price change, volume, tx count, holder growth |
+| On-chain momentum | 10% | Price change, volume, tx count, holder growth |
 | Smart money conviction | 25% | Step 2: signal count, wallet count, sold ratio |
-| **Social sentiment** | **15%** | **Step 3: news + Reddit + Twitter combined socialScore** |
+| Social sentiment | 10% | Step 3: news + Reddit + Twitter combined socialScore |
 | Security score | 25% | Step 5: security scan + advanced info |
+| **Historical validation** | **10%** | **Step 6: DexPaprika OHLCV backtest — price trend, volume, entry timing** |
 | Liquidity depth | 10% | Liquidity USD, liquidity/mcap ratio |
 
-**Social Sentiment Bonus/Penalty:**
+**Signal Bonus/Penalty (Social + Backtest combined):**
 - If social signal = 🔥 VIRAL → add +5 bonus to final score
 - If social signal = 🤫 SILENT_ALPHA → no change (early signal, not penalized)
 - If social signal = ⚠️ HYPE_RISK → subtract -10 from final score (exit liquidity warning)
 - If social signal = 🧊 COLD → subtract -3 from final score
+- If backtest signal = 📈 UPTREND → add +3 bonus (momentum confirmed by history)
+- If backtest signal = 💎 DIAMOND_ENTRY → add +5 bonus (price near bottom + volume expanding)
+- If backtest signal = 📉 DOWNTREND → subtract -5 from final score
+- If backtest signal = 🏔️ NEAR_ATH → subtract -3 from final score (late entry risk)
 
-### 6.3 Purchase Recommendation Tiers
+### 7.3 Purchase Recommendation Tiers
 
 Based on composite score and risk tolerance:
 
@@ -427,19 +544,20 @@ Based on composite score and risk tolerance:
 - Too risky or no clear edge
 - Explain specific red flags
 
-### 6.4 Output Format
+### 7.4 Output Format
 
 Generate the briefing with:
 1. Executive summary (3-5 bullets)
 2. Hot tokens by narrative table
 3. Smart money signal table
-4. **Social sentiment overview (news + Reddit + Twitter summary per token)**
+4. Social sentiment overview (news + Reddit + Twitter summary per token)
 5. Meme scan highlights
 6. Security audit results
-7. Final recommendation table with 6D score breakdown and risk rating
-8. Disclaimer
+7. **Historical validation (price chart summary, backtest scores, entry timing)**
+8. Final recommendation table with 7D score breakdown and risk rating
+9. Disclaimer
 
-### 6.5 Save Report
+### 7.5 Save Report
 
 ```bash
 # Save to reports directory
@@ -456,7 +574,9 @@ mkdir -p reports
 - If security scan returns empty for a token: mark as "UNSCANNED" in the report, do NOT recommend
 - **Social sentiment graceful degradation**: if opennews MCP unavailable → use Reddit + Twitter only; if Reddit blocked → use opennews + Twitter; if all social tools fail → assign socialScore = 50 (neutral) and note "Social data unavailable" in report
 - If xreach times out (common without proxy): fall back to opentwitter-mcp or skip Twitter entirely
-- Always run all 6 steps even if some data is partial — the report should indicate data completeness per step
+- **DexPaprika graceful degradation**: if API returns error or empty data → skip backtesting, assign backtestScore = 50 (neutral) and note "Historical data unavailable" in report
+- If pool not found for a token (new token, no DEX history) → backtestScore = 50, note "No trading history"
+- Always run all 7 steps even if some data is partial — the report should indicate data completeness per step
 
 ## Quick Mode
 
@@ -466,7 +586,8 @@ If the user says "快速扫描" / "quick scan", run abbreviated version:
 3. Quick social scan: opennews only (skip Reddit/Twitter), top 5 tokens
 4. Skip meme scan
 5. Security scan top 5 candidates only
-6. Abbreviated 1-page briefing with 6D scores
+6. Skip backtesting (quick mode does not run DexPaprika)
+7. Abbreviated 1-page briefing with 7D scores (backtest = neutral)
 
 ## Chain Reference
 
